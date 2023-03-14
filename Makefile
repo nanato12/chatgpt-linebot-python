@@ -9,3 +9,11 @@ lint:
 	flake8 .
 	isort .
 	mypy .
+
+.PHONY: ngrok
+ngrok:
+	ngrok http 3000
+
+.PHONY: run
+run:
+	python app.py
