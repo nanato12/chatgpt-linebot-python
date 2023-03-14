@@ -25,7 +25,9 @@ class ChatGPTClient:
         self.messages.append(message)
 
     def create(self) -> OpenAIObject:
-        return openai.ChatCompletion.create(
+        res = openai.ChatCompletion.create(
             model=self.model.value,
             messages=[m.to_dict() for m in self.messages],
         )
+        self.add_message(Message.from_dict(res["choices"][0]["message"]))
+        return res
