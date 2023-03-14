@@ -52,5 +52,5 @@ def handle_message(event: MessageEvent) -> None:
     res_text: str = res["choices"][0]["message"]["content"]
 
     line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text=res_text)
+        event.reply_token, TextSendMessage(text=res_text.strip())
     )
