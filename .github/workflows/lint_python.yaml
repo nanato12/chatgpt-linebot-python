@@ -3,12 +3,16 @@ name: lint python
 on:
   pull_request:
     paths:
-      - "*"
+      - main.py
+      - app/**
+      - .github/workflows/lint_python.yaml
   push:
     branches:
       - develop
     paths:
-      - "*"
+      - main.py
+      - app/**
+      - .github/workflows/lint_python.yaml
 
 jobs:
   build:
