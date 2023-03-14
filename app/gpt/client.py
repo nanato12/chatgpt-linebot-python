@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from os import environ
+from typing import List
 
 import openai
 from openai.openai_object import OpenAIObject
@@ -11,7 +12,7 @@ from app.gpt.message import Message
 @dataclass
 class ChatGPTClient:
     model: Model
-    messages: list[Message] = field(default_factory=list)
+    messages: List[Message] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if not (key := environ.get("CHATGPT_API_KEY")):
