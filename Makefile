@@ -1,5 +1,6 @@
 .PHONY: init
 init:
+	test -f .env || cp .env.template .env
 	pip install --upgrade pip
 	pip install -r requirements.txt
 
@@ -16,4 +17,4 @@ ngrok:
 
 .PHONY: run
 run:
-	python app.py
+	python main.py
