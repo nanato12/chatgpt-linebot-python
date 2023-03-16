@@ -6,9 +6,10 @@ from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, Source, TextMessage, TextSendMessage
+from openai.error import InvalidRequestError
 
 from app.gpt.client import ChatGPTClient
-from app.gpt.constants import Model, Role
+from app.gpt.constants import PROBLEM_OCCURS_TITLE, Model, Role
 from app.gpt.message import Message
 
 load_dotenv(".env", verbose=True)
@@ -54,10 +55,13 @@ def handle_message(event: MessageEvent) -> None:
     gpt_client.add_message(
         message=Message(role=Role.USER, content=text_message.text)
     )
-    res = gpt_client.create()
-    chatgpt_instance_map[user_id] = gpt_client
 
-    res_text: str = res["choices"][0]["message"]["content"]
+    try:
+        res = gpt_client.create()
+        res_text: str = res["choices"][0]["message"]["content"]
+    except InvalidRequestError as e:
+        res_text = f"{PROBLEM_OCCURS_TITLE}\n\n問題が発生したよ。\n一度会話をリセットするよ。\n\n{e.user_message}"
+        gpt_client.reset()
 
     line_bot_api.reply_message(
         event.reply_token, TextSendMessage(text=res_text.strip())
