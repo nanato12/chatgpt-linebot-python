@@ -9,3 +9,6 @@ class Role(Enum):
 
 class Model(Enum):
     GPT35TURBO = "gpt-3.5-turbo"
+
+
+PROBLEM_OCCURS_TITLE = "[これはchatGPTからのメッセージではありません。]"
