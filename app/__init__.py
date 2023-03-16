@@ -27,6 +27,11 @@ handler = WebhookHandler(channel_secret)
 chatgpt_instance_map: Dict[str, ChatGPTClient] = {}
 
 
+@app.route("/", methods=["GET"])
+def index() -> str:
+    return "Hello, ChatGPT LINEBot Python."
+
+
 @app.route("/callback", methods=["POST"])
 def callback() -> str:
     signature = request.headers["X-Line-Signature"]
