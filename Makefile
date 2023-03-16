@@ -13,7 +13,7 @@ lint:
 
 .PHONY: ngrok
 ngrok:
-	ngrok http 3000
+	ngrok http 3000 --region=ap
 
 .PHONY: run
 run:
