@@ -6,9 +6,10 @@ from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, Source, TextMessage, TextSendMessage
+from openai.error import InvalidRequestError, OpenAIError
 
 from app.gpt.client import ChatGPTClient
-from app.gpt.constants import Model, Role
+from app.gpt.constants import PROBLEM_OCCURS_TITLE, Model, Role
 from app.gpt.message import Message
 
 load_dotenv(".env", verbose=True)
@@ -53,16 +54,29 @@ def handle_message(event: MessageEvent) -> None:
     source: Source = event.source
     user_id: str = source.user_id
 
+    if text_message.text == "リセットして":
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=f"{PROBLEM_OCCURS_TITLE}\n\n会話をリセットするよ。"),
+        )
+
     if (gpt_client := chatgpt_instance_map.get(user_id)) is None:
         gpt_client = ChatGPTClient(model=Model.GPT35TURBO)
 
     gpt_client.add_message(
         message=Message(role=Role.USER, content=text_message.text)
     )
-    res = gpt_client.create()
-    chatgpt_instance_map[user_id] = gpt_client
 
-    res_text: str = res["choices"][0]["message"]["content"]
+    try:
+        res = gpt_client.create()
+        res_text: str = res["choices"][0]["message"]["content"]
+    except InvalidRequestError as e:
+        res_text = f"{PROBLEM_OCCURS_TITLE}\n\n問題が発生したよ。\n一度会話をリセットするよ。\n\n{e.user_message}"
+        gpt_client.reset()
+    except OpenAIError as e:
+        res_text = f"{PROBLEM_OCCURS_TITLE}\n\n問題が発生したよ。\n\n{e.user_message}"
+
+    chatgpt_instance_map[user_id] = gpt_client
 
     line_bot_api.reply_message(
         event.reply_token, TextSendMessage(text=res_text.strip())

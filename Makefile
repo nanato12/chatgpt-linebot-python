@@ -13,8 +13,8 @@ lint:
 
 .PHONY: ngrok
 ngrok:
-	ngrok http 3000
+	ngrok http 3000 --region=ap
 
 .PHONY: run
 run:
-	gunicorn -w 2 -b 0.0.0.0:3000 app:app
+	gunicorn -b 127.0.0.1:3000 app:app
